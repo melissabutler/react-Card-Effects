@@ -4,9 +4,11 @@ import axios from "axios";
 
 const BASE_URL = "https://deckofcardsapi.com/api/deck"
 const Deck = () => {
+    //initial state is No Deck
     const [deck, setDeck] = useState(null);
     const [card, setCard] = useState([]);
     const [shuffle, setShuffle] = useState(false);
+
 // Call API to get deck information at start of load, set deck state
     useEffect( function getDeckFromAPI() {
         async function getDeck() {
@@ -22,8 +24,8 @@ const Deck = () => {
             let drawResults = await axios.get(`${BASE_URL}/${deck.deck_id}/draw/`)
 
             if (drawResults.data.remaining === 0){
-                throw new Error("Deck is empty!")
                 setShuffle(true)
+                throw new Error("Deck is empty!")
             }
         // console.log(drawResults)
         let drawnCard = drawResults.data.cards[0]
@@ -38,7 +40,7 @@ const Deck = () => {
 
             }
         ])
-        // console.log(card)
+        console.log(drawResults.data.remaining)
     } catch(err){
         alert(err);
     }
@@ -57,14 +59,27 @@ const Deck = () => {
     }
 
 // if deck is empty, show shuffle button
+ const showShuffleBtn = () => {
+    //if deck is null, show shuffle button
+    if(shuffle === true) {
+        return (
+                <button onClick={shuffleDeck}>Shuffle Deck</button>
+        )
+    }
+ }
 
 //if deck is full, show draw button
+const showDrawBtn = () => {
+    if(shuffle === false) {
+        return (<button onClick={drawCard}>Draw a card!</button>)
+    }
+}
 
 
     return (
         <div>
-            <button onClick={drawCard}>Draw a card!</button>
-            <button onClick={shuffleDeck}>Shuffle Deck</button>
+            {showDrawBtn()}
+            {showShuffleBtn()}
             {card.map(c => (
                 <Card id={c.id} key={c.id} img={c.img} name={c.name} />
             ))}
